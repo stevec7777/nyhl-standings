@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NYHL U13 Tier 2 Standings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 p-4 font-sans max-w-lg mx-auto">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-lg font-bold text-amber-400">U13 Tier 2 Standings</h1>
+    <span class="text-xs text-slate-400">26-27 Fall Season</span>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-slate-800 shadow-xl">
+    <table class="w-full text-xs text-left text-slate-300">
+      <thead class="text-slate-400 uppercase bg-slate-900 border-b border-slate-800">
+        <tr>
+          <th class="py-3 px-2 text-center">#</th>
+          <th class="py-3 px-3">Team</th>
+          <th class="py-3 px-2 text-center">GP</th>
+          <th class="py-3 px-2 text-center">W</th>
+          <th class="py-3 px-2 text-center">L</th>
+          <th class="py-3 px-2 text-center">T</th>
+          <th class="py-3 px-2 text-center font-bold text-white">PTS</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Injected dynamically -->
+      </tbody>
+    </table>
+  </div>
+  <p class="text-[10px] text-slate-500 text-center mt-3">NYHL U13 Tier 2 • Mobile App View</p>
+
+  <script>
+    // Current U13 Tier 2 Standings Data
+    const standings = [
+      { rank: 1, team: "Vaughan Rangers Red", gp: 0, w: 0, l: 0, t: 0, pts: 0 },
+      // Update or add remaining teams as games complete
+    ];
+
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = standings.map(row => `
+      <tr class="border-b border-slate-900 ${row.team.toLowerCase().includes('vaughan') ? 'bg-amber-500/10 font-bold text-amber-300' : ''}">
+        <td class="py-3 px-2 text-center">${row.rank}</td>
+        <td class="py-3 px-3">${row.team}</td>
+        <td class="py-3 px-2 text-center">${row.gp}</td>
+        <td class="py-3 px-2 text-center">${row.w}</td>
+        <td class="py-3 px-2 text-center">${row.l}</td>
+        <td class="py-3 px-2 text-center">${row.t}</td>
+        <td class="py-3 px-2 text-center font-bold text-white">${row.pts}</td>
+      </tr>
+    `).join('');
+  </script>
+</body>
+</html>
