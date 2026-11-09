@@ -4,72 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- Disable Browser Caching -->
+  <!-- Disable Browser Caching to Always Pull Fresh Data -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <title>NYHL Vaughan Rangers Red U13 Tier 2 Standings </title>
+  <title>NYHL U13 Tier 2 Standings</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 p-4 font-sans max-w-lg mx-auto">
-  <div class="flex justify-between items-center mb-4">
-    <div>
-      <h1 class="text-lg font-bold text-amber-400">U13 Tier 2 Standings</h1>
-      <p id="timestamp" class="text-[11px] text-slate-400">Last Updated: Loading...</p>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 text-center sm:text-left">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">NYHL U13 Tier 2 Standings</h1>
+      <p id="update-time" class="text-sm text-slate-400 mt-1">Loading schedule information...</p>
+    </div>
+
+    <!-- Standings Table Container -->
+    <div class="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-700/50 text-slate-300 text-xs uppercase tracking-wider border-b border-slate-700">
+              <th class="py-3 px-4 font-semibold">Rk</th>
+              <th class="py-3 px-4 font-semibold">Team</th>
+              <th class="py-3 px-4 font-semibold text-center">GP</th>
+              <th class="py-3 px-4 font-semibold text-center">W</th>
+              <th class="py-3 px-4 font-semibold text-center">L</th>
+              <th class="py-3 px-4 font-semibold text-center">T</th>
+              <th class="py-3 px-4 font-semibold text-center">Pts</th>
+            </tr>
+          </thead>
+          <tbody id="standings-body" class="divide-y divide-slate-700 text-sm">
+            <!-- Populated dynamically by script below -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="overflow-x-auto rounded-lg border border-slate-800 shadow-xl">
-    <table class="w-full text-xs text-left text-slate-300">
-      <thead class="text-slate-400 uppercase bg-slate-900 border-b border-slate-800">
-        <tr>
-          <th class="py-3 px-2 text-center">#</th>
-          <th class="py-3 px-3">Team</th>
-          <th class="py-3 px-2 text-center">GP</th>
-          <th class="py-3 px-2 text-center">W</th>
-          <th class="py-3 px-2 text-center">L</th>
-          <th class="py-3 px-2 text-center">T</th>
-          <th class="py-3 px-2 text-center font-bold text-white">PTS</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <!-- Injected dynamically -->
-      </tbody>
-    </table>
-  </div>
-  <p class="text-[10px] text-slate-500 text-center mt-3">NYHL U13 Tier 2 • Live Automated Mobile View</p>
-
   <script>
-    // Updated automatically by the hourly GitHub Action script
-    const lastUpdated = "Nov 08, 2026 - 09:37 PM";
-    const standings = [
-      { rank: 1, team: "York Mills Blue", gp: 4, w: 3, l: 0, t: 1, pts: 7 },
-      { rank: 2, team: "Vaughan Red", gp: 3, w: 3, l: 0, t: 0, pts: 6 },
-      { rank: 3, team: "Vaughan JCC", gp: 4, w: 2, l: 0, t: 2, pts: 6 },
-      { rank: 4, team: "West Hill", gp: 4, w: 2, l: 1, t: 1, pts: 5 },
-      { rank: 5, team: "Etobicoke", gp: 4, w: 1, l: 2, t: 1, pts: 3 },
-      { rank: 6, team: "Scarborough Black", gp: 5, w: 1, l: 3, t: 1, pts: 3 },
-      { rank: 7, team: "Forest Hill", gp: 5, w: 1, l: 4, t: 0, pts: 2 },
-      { rank: 8, team: "Avenue Road Black", gp: 5, w: 0, l: 3, t: 2, pts: 2 }
-    ];
+    // These placeholder strings get dynamically updated by your GitHub Action workflow every 30 mins
+    const lastUpdated = "Never";
+    const nextUpdate = "Pending...";
+    const standings = [];
 
-    // Render Last Updated Timestamp
-    document.getElementById('timestamp').innerText = `Last Updated: ${lastUpdated}`;
+    // Render Last Updated & Next Check info in header
+    document.getElementById("update-time").textContent = `Last updated: ${lastUpdated} (Next check: ${nextUpdate})`;
 
-    // Render Table
-    const tbody = document.getElementById('table-body');
-    tbody.innerHTML = standings.map(row => `
-      <tr class="border-b border-slate-900 ${row.team.toLowerCase().includes('vaughan red') ? 'bg-amber-500/10 font-bold text-amber-300' : ''}">
-        <td class="py-3 px-2 text-center">${row.rank}</td>
-        <td class="py-3 px-3">${row.team}</td>
-        <td class="py-3 px-2 text-center">${row.gp}</td>
-        <td class="py-3 px-2 text-center">${row.w}</td>
-        <td class="py-3 px-2 text-center">${row.l}</td>
-        <td class="py-3 px-2 text-center">${row.t}</td>
-        <td class="py-3 px-2 text-center font-bold text-white">${row.pts}</td>
-      </tr>
-    `).join('');
+    // Render Table Rows
+    const tbody = document.getElementById("standings-body");
+    
+    if (standings.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="7" class="py-6 px-4 text-center text-slate-400">Waiting for first sync or parsing data...</td>`;
+      tbody.appendChild(tr);
+    } else {
+      standings.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-700/30 transition-colors";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-medium text-slate-300">${item.rank}</td>
+          <td class="py-3 px-4 font-medium text-white">${item.team}</td>
+          <td class="py-3 px-4 text-center text-slate-300">${item.gp}</td>
+          <td class="py-3 px-4 text-center text-slate-300">${item.w}</td>
+          <td class="py-3 px-4 text-center text-slate-300">${item.l}</td>
+          <td class="py-3 px-4 text-center text-slate-300">${item.t}</td>
+          <td class="py-3 px-4 text-center font-bold text-emerald-400">${item.pts}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
   </script>
 </body>
 </html>
