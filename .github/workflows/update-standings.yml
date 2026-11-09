@@ -1,0 +1,104 @@
+name: Auto Update NYHL Standings
+
+on:
+  schedule:
+    # Runs automatically every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-standings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install beautifulsoup4 requests pytz
+
+      - name: Fetch and parse NYHL standings
+        run: |
+          python - << 'EOF'
+          import requests
+          from bs4 import BeautifulSoup
+          import json
+          from datetime import datetime
+          import pytz
+
+          url = "https://nyhl.on.ca/game-centre/"
+          headers = {'User-Agent': 'Mozilla/5.0'}
+
+          try:
+              res = requests.get(url, headers=headers, timeout=15)
+              soup = BeautifulSoup(res.text, 'html.parser')
+              rows = soup.find_all('tr')
+              parsed_data = []
+
+              for tr in rows:
+                  cells = [td.get_text(strip=True) for td in tr.find_all(['td', 'th'])]
+                  if len(cells) >= 7:
+                      team_name = cells[0]
+                      if any(char.isdigit() for char in cells[1]):
+                          try:
+                              gp = int(cells[1])
+                              w = int(cells[2])
+                              l = int(cells[3])
+                              t = int(cells[4])
+                              pts = (w * 2) + t
+                              parsed_data.append({
+                                  "team": team_name, "gp": gp, "w": w, "l": l, "t": t, "pts": pts
+                              })
+                          except ValueError:
+                              continue
+
+              # Get current time in Toronto (EST)
+              tz = pytz.timezone('America/Toronto')
+              current_time = datetime.now(tz).strftime('%b %d, %Y - %I:%M %p')
+
+              # Read index.html
+              with open('index.html', 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              if parsed_data:
+                  parsed_data.sort(key=lambda x: x['pts'], reverse=True)
+                  for idx, item in enumerate(parsed_data, start=1):
+                      item['rank'] = idx
+
+                  new_json = json.dumps(parsed_data, indent=6)
+                  
+                  # Replace standings array
+                  import re
+                  content = re.sub(
+                      r'const standings = \[.*?\];',
+                      f'const standings = {new_json};',
+                      content,
+                      flags=re.DOTALL
+                  )
+
+              # Always update the timestamp string
+              content = re.sub(
+                  r'const lastUpdated = ".*?";',
+                  f'const lastUpdated = "{current_time}";',
+                  content
+              )
+
+              with open('index.html', 'w', encoding='utf-8') as f:
+                  f.write(content)
+              print("Successfully updated standings and timestamp.")
+
+          except Exception as e:
+              print(f"Error scraping NYHL: {e}")
+          EOF
+
+      - name: Commit and push changes if updated
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Hourly auto-update standings and timestamp [skip ci]" && git push)
