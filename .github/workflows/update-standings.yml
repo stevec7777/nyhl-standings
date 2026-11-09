@@ -2,7 +2,6 @@ name: Auto Update NYHL Standings
 
 on:
   schedule:
-    # Runs automatically every hour
     - cron: '0 * * * *'
   workflow_dispatch:
 
@@ -28,6 +27,7 @@ jobs:
           import requests
           from bs4 import BeautifulSoup
           import json
+          import re
           from datetime import datetime
           import pytz
 
@@ -73,7 +73,6 @@ jobs:
                   new_json = json.dumps(parsed_data, indent=6)
                   
                   # Replace standings array
-                  import re
                   content = re.sub(
                       r'const standings = \[.*?\];',
                       f'const standings = {new_json};',
