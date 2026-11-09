@@ -81,7 +81,7 @@ jobs:
 
                   new_json = json.dumps(parsed_data, indent=6)
                   
-                  # Replace standings array
+                  # Replace standings array (matches index.html variable name)
                   content = re.sub(
                       r'const standings = \[.*?\];',
                       f'const standings = {new_json};',
