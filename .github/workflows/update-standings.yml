@@ -2,7 +2,7 @@ name: Auto Update NYHL Standings
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
           from bs4 import BeautifulSoup
           import json
           import re
-          from datetime import datetime
+          from datetime import datetime, timedelta
           import pytz
 
           url = "https://nyhl.on.ca/game-centre/"
@@ -57,9 +57,18 @@ jobs:
                           except ValueError:
                               continue
 
-              # Get current time in Toronto (EST)
+              # Calculate current time and next 30-min window in Toronto timezone
               tz = pytz.timezone('America/Toronto')
-              current_time = datetime.now(tz).strftime('%b %d, %Y - %I:%M %p')
+              now = datetime.now(tz)
+              
+              # Determine next interval (:00 or :30)
+              if now.minute < 30:
+                  next_run = now.replace(minute=30, second=0, microsecond=0)
+              else:
+                  next_run = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+
+              current_time_str = now.strftime('%b %d, %Y - %I:%M %p')
+              next_time_str = next_run.strftime('%I:%M %p')
 
               # Read index.html
               with open('index.html', 'r', encoding='utf-8') as f:
@@ -80,16 +89,23 @@ jobs:
                       flags=re.DOTALL
                   )
 
-              # Always update the timestamp string
+              # Update Last Updated timestamp
               content = re.sub(
                   r'const lastUpdated = ".*?";',
-                  f'const lastUpdated = "{current_time}";',
+                  f'const lastUpdated = "{current_time_str}";',
+                  content
+              )
+
+              # Update Next Update timestamp
+              content = re.sub(
+                  r'const nextUpdate = ".*?";',
+                  f'const nextUpdate = "~{next_time_str}";',
                   content
               )
 
               with open('index.html', 'w', encoding='utf-8') as f:
                   f.write(content)
-              print("Successfully updated standings and timestamp.")
+              print("Successfully updated standings and timestamps.")
 
           except Exception as e:
               print(f"Error scraping NYHL: {e}")
@@ -100,4 +116,4 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Hourly auto-update standings and timestamp [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update standings and timestamps [skip ci]" && git push)
