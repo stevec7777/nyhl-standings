@@ -33,15 +33,21 @@
   <p class="text-[10px] text-slate-500 text-center mt-3">NYHL U13 Tier 2 • Mobile App View</p>
 
   <script>
-    // Current U13 Tier 2 Standings Data
+    // Complete U13 Tier 2 Division Standings
     const standings = [
-      { rank: 1, team: "Vaughan Rangers Red", gp: 0, w: 0, l: 0, t: 0, pts: 0 },
-      // Update or add remaining teams as games complete
+      { rank: 1, team: "York Mills Blue", gp: 4, w: 3, l: 0, t: 1, pts: 7 },
+      { rank: 2, team: "Vaughan Red", gp: 3, w: 3, l: 0, t: 0, pts: 6 },
+      { rank: 3, team: "Vaughan JCC", gp: 4, w: 2, l: 0, t: 2, pts: 6 },
+      { rank: 4, team: "West Hill", gp: 4, w: 2, l: 1, t: 1, pts: 5 },
+      { rank: 5, team: "Etobicoke", gp: 4, w: 1, l: 2, t: 1, pts: 3 },
+      { rank: 6, team: "Scarborough Black", gp: 5, w: 1, l: 3, t: 1, pts: 3 },
+      { rank: 7, team: "Forest Hill", gp: 5, w: 1, l: 4, t: 0, pts: 2 },
+      { rank: 8, team: "Avenue Road Black", gp: 5, w: 0, l: 3, t: 2, pts: 2 }
     ];
 
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = standings.map(row => `
-      <tr class="border-b border-slate-900 ${row.team.toLowerCase().includes('vaughan') ? 'bg-amber-500/10 font-bold text-amber-300' : ''}">
+      <tr class="border-b border-slate-900 ${row.team.toLowerCase().includes('vaughan red') ? 'bg-amber-500/10 font-bold text-amber-300' : ''}">
         <td class="py-3 px-2 text-center">${row.rank}</td>
         <td class="py-3 px-3">${row.team}</td>
         <td class="py-3 px-2 text-center">${row.gp}</td>
